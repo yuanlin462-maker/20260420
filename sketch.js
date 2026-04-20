@@ -20,17 +20,36 @@ function draw() {
   let videoW = width * 0.6;
   let videoH = height * 0.6;
   
-  // 在繪圖層 (pg) 上進行繪圖
+  // 在繪圖層 (pg) 上進行運算與繪圖
   pg.clear(); // 清除背景，使其透明
-  pg.stroke(255, 0, 0);
-  pg.strokeWeight(4);
-  pg.noFill();
-  pg.rect(0, 0, pg.width, pg.height); // 在邊框畫一個紅框
-  pg.fill(255, 0, 0);
-  pg.noStroke();
-  pg.textAlign(CENTER, CENTER);
-  pg.textSize(24);
-  pg.text("Graphics Layer Overlaid", pg.width / 2, pg.height / 2);
+
+  if (capture.width > 0) {
+    capture.loadPixels();
+    pg.textAlign(CENTER, CENTER);
+    pg.textSize(8);
+    pg.fill(0, 255, 0); // 使用綠色文字方便在影像上閱讀
+    pg.noStroke();
+
+    // 以 20*20 為一個單位遍歷 pg 的範圍
+    for (let y = 0; y < pg.height; y += 20) {
+      for (let x = 0; x < pg.width; x += 20) {
+        // 將 pg 座標映射回攝影機影像的像素座標
+        let camX = floor(map(x, 0, pg.width, 0, capture.width));
+        let camY = floor(map(y, 0, pg.height, 0, capture.height));
+        let index = (camX + camY * capture.width) * 4;
+
+        let r = capture.pixels[index];
+        let g = capture.pixels[index + 1];
+        let b = capture.pixels[index + 2];
+        
+        if (r !== undefined) {
+          let avg = floor((r + g + b) / 3);
+          // 在該 20*20 單位的中心顯示數值
+          pg.text(avg, x + 10, y + 10);
+        }
+      }
+    }
+  }
 
   // 處理左右顛倒（鏡像）並顯示在畫布中間
   push();

@@ -16,8 +16,12 @@ function draw() {
   let videoW = width * 0.6;
   let videoH = height * 0.6;
   
-  // 將影像顯示在畫布中間
+  // 處理左右顛倒（鏡像）並顯示在畫布中間
+  push();
+  translate(width, 0); // 將座標原點移至右側
+  scale(-1, 1);        // 水平翻轉畫布
   image(capture, (width - videoW) / 2, (height - videoH) / 2, videoW, videoH);
+  pop();
 }
 
 function windowResized() {
